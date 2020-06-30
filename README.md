@@ -83,3 +83,9 @@ status:
   loadBalancer: {}
 
 ```
+
+
+#### Start apps with Helm
+
+helm install my-nginx .
+helm upgrade my-nginx .
