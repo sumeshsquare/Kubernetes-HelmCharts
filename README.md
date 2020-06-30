@@ -87,5 +87,6 @@ status:
 
 #### Start apps with Helm
 
-helm install my-nginx .
-helm upgrade my-nginx .
+To deploy first time :`helm install my-nginx`
+
+To update apps: `helm upgrade my-nginx .`
