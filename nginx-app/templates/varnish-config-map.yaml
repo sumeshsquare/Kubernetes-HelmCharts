@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: varnish-vcl
+
+data:
+  {{ (.Files.Glob "config/default.vcl").AsConfig | indent 2 }}

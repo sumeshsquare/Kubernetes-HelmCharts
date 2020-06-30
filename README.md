@@ -1,14 +1,18 @@
 # Kubernetes-HelmCharts
 
-Helm charts directory structure for simple nginx app:
+Helm charts directory structure for simple nginx app with Varnish:
 
 ```
 ├── nginx-app
 │   ├── Chart.yaml
-│   └── templates
-│       ├── nginx-deployment.yaml
-│       └── nginx-service.yaml
+│   ├── templates
+│   │   ├── nginx-deployment.yaml
+│   │   ├── nginx-service.yaml
+│   │   ├── varnish-replication-controller.yaml
+│   │   └── varnish-service.yaml
+│   └── values.yaml
 └── README.md
+
 ```
 
 
