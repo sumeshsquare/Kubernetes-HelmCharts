@@ -90,3 +90,14 @@ status:
 To deploy first time :`helm install my-nginx`
 
 To update apps: `helm upgrade my-nginx .`
+
+List the helm apps: `helm list`
+
+```
+NAME    	NAMESPACE	REVISION	UPDATED                               	STATUS  	CHART        	APP VERSION
+my-nginx	default  	6       	2020-06-30 15:05:33.07778323 +0530 IST	deployed	nginx-app-0.2	1    
+```
+
+To rollback (value is REVISION): `helm rollback my-nginx 5`
+
+To delete the app: `helm delete my-nginx`

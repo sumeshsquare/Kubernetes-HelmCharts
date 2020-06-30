@@ -1,0 +1,47 @@
+kind: ReplicationController
+apiVersion: v1
+metadata:
+  name: varnish-proxy
+  labels:
+    app: varnish-proxy
+spec:
+  replicas: 1
+  selector:
+    app: varnish-proxy
+  template:
+    metadata:
+      name: varnish-proxy
+      creationTimestamp: null
+      labels:
+        app: varnish-proxy
+    spec:
+      volumes:
+        - name: varnish-config
+          configMap:
+            name: varnish-vcl
+            items:
+              - key: default.vcl
+                path: default.vcl
+            defaultMode: 420
+      containers:
+        - name: varnish
+          image: million12/varnish
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: VCL_CONFIG
+              value: /etc/varnish/default.vcl
+          resources: {}
+          volumeMounts:
+            - name: varnish-config
+              mountPath: /etc/varnish/
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+
