@@ -5,13 +5,20 @@ Helm charts directory structure for simple nginx app with Varnish:
 ```
 ├── nginx-app
 │   ├── Chart.yaml
+│   ├── config
+│   │   └── default.vcl
 │   ├── templates
 │   │   ├── nginx-deployment.yaml
 │   │   ├── nginx-service.yaml
+│   │   ├── varnish-config-map.yaml
 │   │   ├── varnish-replication-controller.yaml
 │   │   └── varnish-service.yaml
 │   └── values.yaml
 └── README.md
+
+
+minikube version: v1.11.0
+helm version: v3.2.4+g0ad800e
 
 ```
 
@@ -105,3 +112,98 @@ my-nginx	default  	6       	2020-06-30 15:05:33.07778323 +0530 IST	deployed	ngin
 To rollback (value is REVISION): `helm rollback my-nginx 5`
 
 To delete the app: `helm delete my-nginx`
+
+
+
+
+#### Setup Varnish
+
+varnish-replication-controller.yaml
+
+```
+kind: ReplicationController
+apiVersion: v1
+metadata:
+  name: varnish-proxy
+  labels:
+    app: varnish-proxy
+spec:
+  replicas: 1
+  selector:
+    app: varnish-proxy
+  template:
+    metadata:
+      name: varnish-proxy
+      creationTimestamp: null
+      labels:
+        app: varnish-proxy
+    spec:
+      volumes:
+        - name: varnish-config
+          configMap:
+            name: varnish-vcl
+            items:
+              - key: default.vcl
+                path: default.vcl
+            defaultMode: 420
+      containers:
+        - name: varnish
+          image: million12/varnish
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: VCL_CONFIG
+              value: /etc/varnish/default.vcl
+          resources: {}
+          volumeMounts:
+            - name: varnish-config
+              mountPath: /etc/varnish/
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+
+```
+
+varnish-service.yaml
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: varnish-svc
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 32055
+  selector:
+    app: varnish-proxy
+  clusterIP: 10.105.57.236
+  type: NodePort
+
+```
+
+copy the varnish config file `default.vcl` in config directory
+
+create varnish-config-map.yaml with varnish config file location from relative path
+
+```
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: varnish-vcl
+
+data:
+  {{ (.Files.Glob "config/default.vcl").AsConfig | indent 2 }}
+```
+
+Run: `helm upgrade my-nginx .`
+
+To get the service url, run `minikube service varnish-svc --url`
