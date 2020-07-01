@@ -1,5 +1,5 @@
-kind: ReplicationController
-apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: varnish-proxy
   labels:
@@ -7,7 +7,8 @@ metadata:
 spec:
   replicas: 1
   selector:
-    app: varnish-proxy
+    matchLabels:
+      app: varnish-proxy
   template:
     metadata:
       name: varnish-proxy
