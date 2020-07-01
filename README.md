@@ -11,7 +11,7 @@ Helm charts directory structure for simple nginx app with Varnish:
 │   │   ├── nginx-deployment.yaml
 │   │   ├── nginx-service.yaml
 │   │   ├── varnish-config-map.yaml
-│   │   ├── varnish-replication-controller.yaml
+│   │   ├── varnish-deployment.yaml
 │   │   └── varnish-service.yaml
 │   └── values.yaml
 └── README.md
@@ -118,11 +118,11 @@ To delete the app: `helm delete my-nginx`
 
 #### Setup Varnish
 
-varnish-replication-controller.yaml
+varnish-deployment.yaml
 
 ```
-kind: ReplicationController
-apiVersion: v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: varnish-proxy
   labels:
@@ -130,7 +130,8 @@ metadata:
 spec:
   replicas: 1
   selector:
-    app: varnish-proxy
+    matchLabels:
+      app: varnish-proxy
   template:
     metadata:
       name: varnish-proxy
